@@ -9,14 +9,14 @@ ploton = 1; % plot ship paths
 
 VLA1 = [70+35.827/60,40+28.207/60]; % location of VLA1 at deployment
 VLA2 = [70+31.679/60,40+26.557/60]; % location of VLA2 at deployment
-load('../../SCE2017_FFI/Flatlon.mat');
+load('Flatlon.mat');
 
- % % Find ships south of array % %
+ % % Find ships % %
  Ships = struct();
  g = fieldnames(GPS);
  pictick = 1;
  for ii = 1:length(g)
-     if sum(GPS.(g{ii}).lat < VLA2(2)) == length(GPS.(g{ii}).lat)
+   %  if sum(GPS.(g{ii}).lat < VLA2(2)) == length(GPS.(g{ii}).lat)
          Ships.(g{ii}) = GPS.(g{ii});
          
      % % Compute ranges and azimuths for south ships % %    
@@ -30,8 +30,20 @@ load('../../SCE2017_FFI/Flatlon.mat');
          end
          
          % interpolate
-         Ships.(g{ii}).range = interp1(Ships.(g{ii}).dnum, Ships.(g{ii}).range, Ships.(g{ii}).dtime,'linear');
-         Ships.(g{ii}).azimuth = interp1(Ships.(g{ii}).dnum, Ships.(g{ii}).azimuth, Ships.(g{ii}).dtime,'linear');
+         % remove non-unique points
+         dunique = unique(Ships.(g{ii}).dnum);
+         if length(dunique)~=length(Ships.(g{ii}).dnum)
+            for jj = 1:length(dunique)
+                rng(jj) = mean(Ships.(g{ii}).range(Ships.(g{ii}).dnum == dunique(jj)));
+                azz(jj) = mean(Ships.(g{ii}).azimuth(Ships.(g{ii}).dnum == dunique(jj)));
+            end
+            Ships.(g{ii}).range = rng;
+            Ships.(g{ii}).azimuth = azz;
+         end
+  
+         
+         Ships.(g{ii}).range = interp1(dunique, Ships.(g{ii}).range, Ships.(g{ii}).dtime,'linear');
+         Ships.(g{ii}).azimuth = interp1(dunique, Ships.(g{ii}).azimuth, Ships.(g{ii}).dtime,'linear');
          
          if PLOT
             hold on;
@@ -47,7 +59,7 @@ load('../../SCE2017_FFI/Flatlon.mat');
             pictick = pictick+1;
          end
          
-     else
-         disp('The ship traverses north of VLA2.');
-     end  
+    % else
+     %    disp('The ship traverses north of VLA2.');
+   %  end  
  end
