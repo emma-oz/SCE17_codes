@@ -41,6 +41,7 @@ load('Flatlon.mat');
                 rng(jj) = mean(Ships.(g{ii}).range(Ships.(g{ii}).dnum == dunique(jj)));
                 azz(jj) = mean(Ships.(g{ii}).azimuth(Ships.(g{ii}).dnum == dunique(jj)));
             end
+            Ships.(g{ii}).dnum = dunique;
             Ships.(g{ii}).R = rng;
             Ships.(g{ii}).A = azz;
             clear rng azz
