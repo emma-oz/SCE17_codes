@@ -12,9 +12,9 @@ import random
 import os
 import time
 
-savepath = 'Mud_lowf/'
+savepath = 'TwoLayer_lowf'
 datapath = ''
-pm = sio.loadmat(datapath + 'SCE17_simulation_Mud_lowf.mat')
+pm = sio.loadmat(datapath + 'SCE17_simulation_TwoLayer_lowf.mat')
 p = pm['pm'][0][0]
 f = pm['f']
 SNR = np.float(15)
@@ -22,6 +22,7 @@ NTracks = 5 # number of tracks desired
 ref_range = 500 # reference range bin to define SNR = range (m) /10
 midf = np.int(np.floor(f.shape[1]/2))
 
+savepath = savepath + '_' + str(np.int(SNR)) + 'dB/'
 root = np.arange(13,13+NTracks)
 rnl = 10**(-SNR/20)*np.linalg.norm(np.squeeze(p[:,ref_range,midf]))
 
