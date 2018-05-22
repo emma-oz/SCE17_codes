@@ -18,13 +18,14 @@ pm = sio.loadmat(datapath + 'SCE17_simulation_TwoLayer_lowf.mat')
 p = pm['pm'][0][0]
 f = pm['f']
 SNR = np.float(15)
-NTracks = 5 # number of tracks desired
+NTracks = 10 # number of tracks desired
 ref_range = 500 # reference range bin to define SNR = range (m) /10
-midf = np.int(np.floor(f.shape[1]/2))
 
 savepath = savepath + '_' + str(np.int(SNR)) + 'dB/'
 root = np.arange(13,13+NTracks)
-rnl = 10**(-SNR/20)*np.linalg.norm(np.squeeze(p[:,ref_range,midf]))
+rnl = np.empty((f.shape[1]))
+for ff in np.arange(0,f.shape[1]):
+    rnl[ff] = 10**(-SNR/20)*np.linalg.norm(np.squeeze(p[:,ref_range,ff]))
 
 if not os.path.exists(savepath):
     os.makedirs(savepath)
@@ -39,7 +40,7 @@ for i in np.arange(0,len(root)):
             random.seed(root[i])
             
             d = np.squeeze(p[:,i,fi]) # select vector
-            d = d + rnl*(np.random.normal(size=(p.shape[0])) + # add random noise
+            d = d + rnl[fi]*(np.random.normal(size=(p.shape[0])) + # add random noise
                          1j*np.random.normal(size=(p.shape[0]))) 
             
             # use magnitude and phase unwrapped re. top phone
