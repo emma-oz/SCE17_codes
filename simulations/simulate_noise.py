@@ -12,9 +12,9 @@ import random
 import os
 import time
 
-savepath = 'TwoLayer_lowf'
+savepath = 'Mud_lowf'
 datapath = ''
-pm = sio.loadmat(datapath + 'SCE17_simulation_TwoLayer_lowf.mat')
+pm = sio.loadmat(datapath + 'SCE17_simulation_Mud_lowf.mat')
 p = pm['pm'][0][0]
 f = pm['f']
 SNR = np.float(15)
@@ -32,22 +32,23 @@ if not os.path.exists(savepath):
         
 for i in np.arange(0,len(root)):
     stat = time.time()
-    out = np.zeros((p.shape[1],p.shape[0]-1, p.shape[2], 2))   
+    out = np.zeros((p.shape[1]-100,p.shape[0]-1, p.shape[2], 2))   
     
-    for r in np.arange(0,p.shape[1]):
+    for r in np.arange(100,p.shape[1]):
     
         for fi in np.arange(0,f.shape[1]):
             random.seed(root[i])
             
-            d = np.squeeze(p[:,i,fi]) # select vector
+            d = np.squeeze(p[:,r,fi]) # select vector
             d = d + rnl[fi]*(np.random.normal(size=(p.shape[0])) + # add random noise
                          1j*np.random.normal(size=(p.shape[0]))) 
             
             # use magnitude and phase unwrapped re. top phone
             fr = np.abs(d[1:])
             fim = np.unwrap(np.angle(d[1:]) - np.angle(d[0]))
-            out[r,:,fi,0] = fr
-            out[r,:,fi,1] = fim
+            fim = fim - np.mean(fim)
+            out[r-100,:,fi,0] = fr
+            out[r-100,:,fi,1] = fim
     pickle.dump(out, open(savepath + 'track_' + str(root[i]) + '.p','wb'))
     print('%s seconds' % (time.time()-stat))
 
